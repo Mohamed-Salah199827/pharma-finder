@@ -1,0 +1,58 @@
+version: "3.9"
+
+services:
+  app:
+    build:
+      context: ./docker/php
+      dockerfile: Dockerfile
+    container_name: pharma_app
+    working_dir: /var/www/html
+    volumes:
+      - ./src:/var/www/html
+      - ./docker/supervisor/supervisor.conf:/etc/supervisor/conf.d/laravel-worker.conf
+    environment:
+      APP_ENV: local
+      APP_DEBUG: 1
+    depends_on:
+      - mysql
+      - meilisearch
+      - redis
+    ports:
+      - "8080:8000"   # php artisan serve داخل الكونتينر
+    command: >
+      sh -lc "php artisan key:generate --force || true
+      && php artisan migrate --force || true
+      && php artisan optimize
+      && supervisord -c /etc/supervisor/supervisord.conf
+      && php artisan serve --host=0.0.0.0 --port=8000"
+
+  mysql:
+    image: mysql:8.0
+    container_name: pharma_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: pharma
+      MYSQL_USER: pharma
+      MYSQL_PASSWORD: pharma
+    ports: ["3307:3306"]
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password --innodb_buffer_pool_size=512M --innodb_log_file_size=256M
+
+  redis:
+    image: redis:7-alpine
+    container_name: pharma_redis
+    ports: ["6380:6379"]
+
+  meilisearch:
+    image: getmeili/meilisearch:v1.11
+    container_name: pharma_meili
+    environment:
+      MEILI_NO_ANALYTICS: "true"
+    ports: ["7700:7700"]
+    volumes:
+      - meili_data:/meili_data
+
+volumes:
+  mysql_data:
+  meili_data:
