@@ -17,8 +17,7 @@ class ImportInventoryJob implements ShouldQueue
     public int $pharmacyId;
     public string $path;
 
-    // اوبشنال: زوّد وقت وتكرار المحاولات لو حابب
-    public $timeout = 600; // 10 minutes
+    public $timeout = 600;   
     public int $tries = 2;
 
     public function __construct(int $pharmacyId, string $path)
@@ -48,7 +47,6 @@ class ImportInventoryJob implements ShouldQueue
             return;
         }
 
-        // Normalize header names (lowercase/trim)
         $headers = array_map(fn($h) => strtolower(trim($h)), $headers);
         $skuIdx = array_search('sku', $headers);
         $priceIdx = array_search('price', $headers);

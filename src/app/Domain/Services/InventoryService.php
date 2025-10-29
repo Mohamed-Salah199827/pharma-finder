@@ -37,7 +37,7 @@ class InventoryService
                 'is_available' => $qty > 0,
                 'last_stock_update' => $now,
                 'created_at' => $now,
-                'updated_at' => $now, // لو محتاج
+                'updated_at' => $now, 
             ];
         }
 

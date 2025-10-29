@@ -29,7 +29,6 @@ class Category extends Model
         });
     }
 
-    /** IDs of self + descendants (سريعة لو عدد التصنيفات معقول، وإلا اعمل caching) */
     public function descendantIds(): array
     {
         $all = Category::select('id', 'path')->get();

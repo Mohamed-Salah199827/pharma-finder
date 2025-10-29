@@ -21,10 +21,7 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('product-variants', ProductVariantController::class);
     Route::apiResource('pharmacies', PharmacyController::class);
 
-    // Bulk inventory import (async)
-    Route::post('/pharmacies/{pharmacy}/inventory/bulk', [InventoryController::class, 'bulk'])
-        ->name('inventory.bulk');
+    Route::post('/pharmacies/{pharmacy}/inventory/bulk', [InventoryController::class, 'bulk']);
 
-    // Search
     Route::get('/search/variants', [SearchController::class, 'variants']);
 });

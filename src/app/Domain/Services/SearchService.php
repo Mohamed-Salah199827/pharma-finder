@@ -12,17 +12,14 @@ class SearchService
     {
         $q = trim((string) ($params['q'] ?? ''));
 
-        // 1) Scout search → get ids by relevance
         $builder = ProductVariant::search($q);
         $ids = $builder->keys();
 
-        // fallback لو مفيش q (هات كل حاجة)
         $base = ProductVariant::with('product.manufacturer', 'product.category');
         if ($q !== '') {
             $base->whereIn('id', $ids ?: [0]);
         }
 
-        // 2) Facets
         if (!empty($params['category_id'])) {
             $cat = Category::find($params['category_id']);
             if ($cat) {
@@ -47,7 +44,6 @@ class SearchService
             $base->whereHas('inventories', fn($qq) => $qq->whereBetween('price', [$min, $max]));
         }
 
-        // احفظ ترتيب السكوت (لو في q)
         if ($q !== '' && $ids) {
             $order = implode(',', $ids->toArray());
             $base->orderByRaw("FIELD(id, $order)");
