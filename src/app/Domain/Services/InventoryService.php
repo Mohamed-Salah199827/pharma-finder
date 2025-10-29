@@ -11,10 +11,12 @@ class InventoryService
     {
     }
 
-    /** items: [['sku'=>'PAN-500-24','price'=>12.5,'quantity'=>20], ...] */
     public function bulkImport(int $pharmacyId, array $items): void
     {
-        $skus = collect($items)->pluck('sku')->unique()->values();
+        $skus = collect($items)->pluck('sku')->filter()->unique()->values();
+        if ($skus->isEmpty())
+            return;
+
         $map = ProductVariant::whereIn('sku', $skus)->pluck('id', 'sku');
 
         $rows = [];
@@ -24,14 +26,18 @@ class InventoryService
             $vid = $map[$i['sku']] ?? null;
             if (!$vid)
                 continue;
+
             $qty = (int) ($i['quantity'] ?? 0);
+            $price = (float) ($i['price'] ?? 0);
+
             $rows[] = [
                 'product_variant_id' => $vid,
-                'price' => round($i['price'], 2),
+                'price' => round($price, 2),
                 'quantity' => $qty,
                 'is_available' => $qty > 0,
                 'last_stock_update' => $now,
                 'created_at' => $now,
+                'updated_at' => $now, // لو محتاج
             ];
         }
 
@@ -39,4 +45,5 @@ class InventoryService
             $this->inventories->upsertMany($pharmacyId, $rows);
         }
     }
+
 }

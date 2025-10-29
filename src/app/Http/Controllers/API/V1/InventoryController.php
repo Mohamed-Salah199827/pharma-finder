@@ -12,14 +12,16 @@ class InventoryController extends Controller
     public function bulk(Request $request, Pharmacy $pharmacy)
     {
         $data = $request->validate([
-            'items' => 'required|array|min:1',
-            'items.*.sku' => 'required|string',
-            'items.*.price' => 'required|numeric|min:0',
-            'items.*.quantity' => 'required|integer|min:0',
+            'file' => 'required|file|mimes:csv,txt|max:10240',
         ]);
 
-        dispatch(new ImportInventoryJob($pharmacy->id, $data['items']));
+        $path = $request->file('file')->store('imports');
 
-        return response()->json(['message' => 'Queued'], 202);
+        ImportInventoryJob::dispatch($pharmacy->id, $path);
+
+        return response()->json([
+            'message' => 'Queued',
+            'file' => $path,
+        ], 202);
     }
 }
