@@ -1,0 +1,14 @@
+<?php
+
+namespace {{ namespace }};
+
+{{ factoryImport }}
+use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasUuid;
+
+class {{ class }} extends Model
+{
+    use HasUuid,HasFactory;
+     protected $fillable = ['uuid'];
+    {{ factory }}
+}

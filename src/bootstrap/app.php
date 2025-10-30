@@ -4,6 +4,8 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Console\Commands\FindCheapestPharmacies;
+use App\Console\Commands\MakeRepositoryCommand;
+use App\Console\Commands\MakeServiceCommand;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -19,5 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })->withCommands([
         FindCheapestPharmacies::class,
+        MakeRepositoryCommand::class,
+        MakeServiceCommand::class,
     ])
     ->create();
